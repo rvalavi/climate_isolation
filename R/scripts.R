@@ -6,26 +6,31 @@ library(zeallot)
 # get the range of a raster
 get_range <- function(x) {
     require(terra)
-    if (x@ptr@.xData$hasRange) {
-        rng <-  c(
-            x@ptr@.xData$range_min,
-            x@ptr@.xData$range_max
-        )
+    if(is(dat, "SpatRaster")) {
+        if (x@ptr@.xData$hasRange) {
+            rng <-  c(
+                x@ptr@.xData$range_min,
+                x@ptr@.xData$range_max
+            )
+        } else {
+            rng <- c(
+                terra::global(x, fun = "min", na.rm = TRUE)[1,1],
+                terra::global(x, fun = "max", na.rm = TRUE)[1,1]
+            )
+        }
     } else {
-        rng <- c(
-            terra::global(x, fun = "min", na.rm = TRUE)[1,1],
-            terra::global(x, fun = "max", na.rm = TRUE)[1,1]
-        )
+        rng <- apply(x, 2, range)
     }
+    
     return(rng)
 }
 
 
 # model the climate categories
 categorise <- function(dat, n) {
-    
     if(is(dat, "SpatRaster")) {
         stop("SpatRaster support is not added yet!")
+        # get_range(dat)
     } else {
         x <- dat[, 1]
         y <- dat[, 2]
