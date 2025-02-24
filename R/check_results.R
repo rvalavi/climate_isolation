@@ -25,3 +25,16 @@ ggplot(dt, aes(x, y, color = as.factor(vals))) +
     labs(x = "PC1", y = "PC2")
 
 
+
+library(terra)
+
+r <- terra::rast(nrow = 10, ncol = 10)
+values(r) <- rnorm(100)
+x <- c(r, r**2)
+plot(x)
+
+
+
+
+
+

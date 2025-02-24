@@ -1,25 +1,24 @@
 library(terra)
 library(ggplot2)
 library(Rcpp)
-library(zeallot)
 
-# get the range of a raster
+# get the range of a raster or matrix
 get_range <- function(x) {
     require(terra)
-    if(is(dat, "SpatRaster")) {
+    if(is(x, "SpatRaster")) {
         if (x@ptr@.xData$hasRange) {
-            rng <-  c(
+            rng <-  cbind(
                 x@ptr@.xData$range_min,
                 x@ptr@.xData$range_max
             )
         } else {
-            rng <- c(
-                terra::global(x, fun = "min", na.rm = TRUE)[1,1],
-                terra::global(x, fun = "max", na.rm = TRUE)[1,1]
+            rng <- cbind(
+                terra::global(x, fun = "min", na.rm = TRUE),
+                terra::global(x, fun = "max", na.rm = TRUE)
             )
         }
     } else {
-        rng <- apply(x, 2, range)
+        rng <- t(apply(x, 2, range))
     }
     
     return(rng)
@@ -27,20 +26,17 @@ get_range <- function(x) {
 
 
 # model the climate categories
-categorise <- function(dat, n) {
-    if(is(dat, "SpatRaster")) {
-        stop("SpatRaster support is not added yet!")
-        # get_range(dat)
-    } else {
-        x <- dat[, 1]
-        y <- dat[, 2]
-        
-    }
+categorise <- function(x, n) {
+    # get the range
+    rng <- get_range(x)
+    # make the sequence
+    xr <- seq(rng[1,1], rng[1,2], length.out = n + 1)[-1]
+    yr <- seq(rng[2,1], rng[2,2], length.out = n + 1)[-1]
     
-    xr <- seq(min(x), max(x), length.out = n + 1)[-1]
-    yr <- seq(min(y), max(y), length.out = n + 1)[-1]
-    
-    out <- list(x = xr, y = yr, n = n, data = dat)
+    out <- list(
+        x = xr, y = yr, n = n, 
+        data = if(is(x, "SpatRaster")) NULL else x
+    )
     class(out) <- "categorise"
     
     return(out)
