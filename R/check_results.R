@@ -28,10 +28,30 @@ ggplot(dt, aes(x, y, color = as.factor(vals))) +
 
 library(terra)
 
-r <- terra::rast(nrow = 10, ncol = 10)
-values(r) <- rnorm(100)
+r <- terra::rast(matrix(NA, nrow = 100, ncol = 100))
+values(r) <- rnorm(10000)
 x <- c(r, r**2)
+names(x) <- c("PC1", "PC2")
 plot(x)
+
+ct <- categorise(x = x, 3)
+ctr <- predict(x, ct)
+plot(ctr)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

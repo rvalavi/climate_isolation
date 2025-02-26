@@ -6,7 +6,7 @@ library(Rcpp)
 get_range <- function(x) {
     require(terra)
     if(is(x, "SpatRaster")) {
-        if (x@ptr@.xData$hasRange) {
+        if (all(x@ptr@.xData$hasRange)) {
             rng <-  cbind(
                 x@ptr@.xData$range_min,
                 x@ptr@.xData$range_max
@@ -46,6 +46,7 @@ categorise <- function(x, n) {
 predict.categorise <- function(model, newdata = NULL, ...) {
     # recursive function... run the same function in case of empty newdata
     if (is.null(newdata)) {
+        if (is.null(model[["data"]])) stop("The newdata is not provided!")
         return(
             predict(model, model[["data"]])
         )
